@@ -1,0 +1,36 @@
+---
+title: Exploring the relationship between transmission type and miles per gallon for
+  mtcars dataset
+author: "Reza Nirumand"
+date: "Wednesday, September 09, 2015"
+output: html_document
+---
+
+Summary
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+required packages
+we need to load required packages.
+```{r }
+library(datasets)
+library(ggplot2)
+
+source:
+Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391-411.
+
+Basic Analysis
+
+[, 1]    mpg	 Miles/(US) gallon
+[, 2]	 cyl	 Number of cylinders
+[, 3]	 disp	 Displacement (cu.in.)
+[, 4]	 hp	 Gross horsepower
+[, 5]	 drat	 Rear axle ratio
+[, 6]	 wt	 Weight (lb/1000)
+[, 7]	 qsec	 1/4 mile time
+[, 8]	 vs	 V/S
+[, 9]	 am	 Transmission (0 = automatic, 1 = manual)
+[,10]	 gear	 Number of forward gears
+[,11]	 carb	 Number of carburetors
