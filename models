@@ -1,0 +1,15 @@
+my model:
+outcome=mpg
+fit1<-lm(data=dt,mpg~am)
+fit2<-lm(data=dt,mpg~am+disp)
+fit3<-lm(data=dt,mpg~am+disp+cyl)
+fit4<-lm(data=dt,mpg~am+disp+cyl+carb)
+fit5<-lm(data=dt,mpg~am+disp+cyl+carb+wt)
+fit6<-lm(data=dt,mpg~am+disp+wt+cyl+carb+vs)
+fit7<-lm(data=dt,mpg~am+disp+wt+cyl+carb+gear+vs)
+
+anova(fit1,fit2,fit3,fit4,fit5,fit6,fit7)
+
+> null=lm(data=dt,mpg~am)
+> full=lm(data=dt,mpg~.)
+> step(null,scope=list(lower=null,upper=full,direction="forward"))

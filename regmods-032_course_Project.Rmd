@@ -1,36 +1,91 @@
 ---
-title: Exploring the relationship between transmission type and miles per gallon for
-  mtcars dataset
+title: "Identifing effective variables on miles per gallon for mtcars dataset"
 author: "Reza Nirumand"
-date: "Wednesday, September 09, 2015"
+date: "Wednesday, September 28, 2015"
 output: html_document
 ---
 
-Summary
+#Executive Summary
+In this document we have analysed a car dataset consiting of 32 observations and 11 variables. Considering the importance of transmission type we have tried to answer below two questions using explatory data analysis and linear regression:
+## *Is an automatic or manual transmission better for MPG?*##
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+##*Quantifing the MPG difference between automatic and manual transmissions*##
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#Loading requried tools & preparing data  
+Original *mtcars* dataset consists of 32 observations with 11 variables which all stored as number Considering the documentations i have decided to do:  
+-to remove qsec from the dataset as it is not relevant to fuel consumption rather it shows overall car performance.  
+-to convert the variables "am"={0,1},"vs"={0,1} to factor variables  
 
-required packages
-we need to load required packages.
-```{r }
-library(datasets)
-library(ggplot2)
+```{r prep,echo=TRUE,message=FALSE}
+library(datasets);library(ggplot2);library(dplyr);library(tidyr);library(GGally)
+dt<-select(mtcars,-qsec) ##removing irrelevant column
+dt<-mutate(dt,am=factor(am),vs=factor(vs)) ##adjusting column type
+summary(dt) ##lets see the data
+```
 
-source:
-Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391-411.
+A brief description of features(variables):  
+***mpg:*** Miles/(US) gallon ;  ***cyl:*** Number of cylinders ; ***disp:*** Displacement (cubic inch) ; ***hp:*** Gross horsepower ;***drat:*** Rear axle ratio ; ***wt:*** Weight (lb/1000) ; ***qsec:*** 1/4 mile time ; ***vs:*** V/S ; ***am:*** Transmission (0 = automatic, 1 = manual) ; ***gear:*** Number of forward gears ; ***carb:*** Number of carburetors.  
 
-Basic Analysis
+#Explatory data analysis#  
 
-[, 1]    mpg	 Miles/(US) gallon
-[, 2]	 cyl	 Number of cylinders
-[, 3]	 disp	 Displacement (cu.in.)
-[, 4]	 hp	 Gross horsepower
-[, 5]	 drat	 Rear axle ratio
-[, 6]	 wt	 Weight (lb/1000)
-[, 7]	 qsec	 1/4 mile time
-[, 8]	 vs	 V/S
-[, 9]	 am	 Transmission (0 = automatic, 1 = manual)
-[,10]	 gear	 Number of forward gears
-[,11]	 carb	 Number of carburetors
+```{r calcExplatory,echo=FALSE,message=FALSE}
+mpgMean<-mean(dt$mpg);mpgSd<-sd(dt$mpg)
+```  
+
+Figure.1 shows histogram of miles per gallon for the dataset. The variable mpg has the average `r mpgMean` and standard deviation `r mpgSd` .   
+```{r figure1,echo=FALSE,message=FALSE,fig.height=4,fig.width=4}
+hist(dt$mpg,col="gray",xlab = "miles per gallon",ylab = "Count",main="Fig.1: Histogram of miles per gallon")##figure1
+abline(v = mean(dt$mpg),col="red") ##adding mean
+````
+
+Figure.2 shows relationship between transmission type and miles per gallon.  
+```{r figure2,echo=FALSE,message=FALSE,fig.height=4,fig.width=4}
+fig2<-ggplot(data=dt,aes(y=mpg,x=am,fill=am),legend=NULL)
+fig2<-fig2+geom_violin()
+fig2<-fig2+scale_x_discrete(breaks=c(0,1),labels=c("Automaitc","Manaul"))
+fig2<-fig2+xlab("Transmission type")+ylab("Miles/(US) gallon") ## labeling y axis ##labeling x,y axis
+##fig2<-fig2+scale_fill_discrete(name="Transmission type",breaks=c(0,1),labels=c("Automaitc","Manaul")) ## setting correct names for legends.
+fig2<-fig2+ggtitle("Fig.2:Comparison of Miles/galon for diffrenct cars\nbased on transmission type")+guides(fill=FALSE)
+fig2
+```
+
+```{r echo=FALSE,message=FALSE,fig.height=9,fig.width=9}
+##g<-ggpairs(data=dt,lower=list(continuous="smooth"),params=c(method="loess")) ##i should do plot the mpg in diffrent colors and diffrent regression line 
+##g
+````
+
+#Model Selection  
+In order to find a parsimonious model, we will use *nested model*  technique. That means we will begin with one regressor and will add regressors one-by-one, comparing the result for each model using anova test.
+But Considering the correlation matrix ??? finding the best subset of regressors requires exhaustive search for the best subsets of the variables.
+This can be done using diffrent r-packages such as ***"leaps"***.  
+But for the purpose of this project i have decided to follow the strategy of including variables which could describ other variables as well. 
+For example hp could describe displacement,cyl,vs,carb and these described variables will not be added to the models.
+
+```{r cluster2}
+t1<-lm(data=dt,mpg~am)
+t2<-lm(data=dt,mpg~am+hp)
+t3<-lm(data=dt,mpg~am+hp+wt)
+t4<-lm(data=dt,mpg~am+hp+wt+gear)
+t5<-lm(data=dt,mpg~am+hp+wt+drat)
+anova(t1,t2,t3,t4,t5)
+```
+
+Considering the anova test we will choose the model 3 since it shows significant change in RSS. Now we need to validae our model for the underling assupmions. The assumption for anova test is that the model's Residual are approximately Normal. To validate the assumption so we will use the ***Shapiro-Wilk test***. The null hypothesis on this test is that the distribution is approximately normal. Considering the following result we fail to reject the null hypothesis, hence our anova test is valid.
+
+```{r shapiroTest,echo=TRUE}
+st<-shapiro.test(t3$residuals)
+st
+```
+
+#Results
+
+- R2=.6 means 60% of variation of outcome is explained by linear relationship with regressors.
+
+
+
+#Appendix A: Figures
+
+
+
+##Apendix B: Envirnoment Setup
+Windows 10 X64 ; - R version 3.2.2 (2015-08-14) ; Rstudio Version 0.98.1103

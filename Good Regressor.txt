@@ -1,0 +1,19 @@
+The variable that has to be there at the end of the modelling process is the outcome, mpg.  All the other variables are potential predictors or regressors of mpg. But not all those predictors do a very good job of predicting.  
+
+Good regressors have three main qualities.
+
+1.  They vary enough along the x axis.
+2.   When they vary along the x axis, the outcome variable varies along the y axis in linear or curvilinear or some identifiable pattern.
+3.  Using the linear pattern as an example, the points stay fairly close to that line.
+
+Now just because the editor quotes a familiar old saw that "transmission affects fuel efficiency", that does not make it true.  Our job is to see if the data makes it true, or at least points in that direction, given that absolute truth is anti-scientific.  And if you look at the above graph in terms of 1-3 above, you have some of the evidence for deciding whether to include am as a "difference that is going to make a difference."
+
+And while you are keeping the editor happy by discussing his pet theory, you also need to focus on what is really going on in your data, by "seeing big, seeing simple".  There is one predictor that will give you an r_squared (variance explained), from my memory, in the high 70%.  And it is logical to build your model around that one.
+
+Some other predictors may improve your r-squared, but if you get too complicated you tend to pay a penalty in terms of 3 above.  Every time you add a new predictor component you are in effect adding a new dimension to your model and this can increase those point 3 problems (above) exponentially.
+
+Say, for excessive simplicity of an example, all your variables can be measured on 10 point scales.  So, with one outcome (y) and one  predictor (x) you have 100 points (10*10) around your regression line in which to make errors.  Add a new predictor (z axis) and you 1000 potential error points (10*10*10). 
+
+The result is that your r_squared may creep up a bit (helpfully), but your variances (std error, etc) are going through the roof (not helpful).  Hence the joke, "sometimes I am very reliable."
+
+I hope that makes sense and that others will feel free to critique my metaphors, if I have been a bit lose with the facts for the sake of a simple story.
