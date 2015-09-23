@@ -1,15 +1,15 @@
 ---
-title: "Identifing effective variables on miles per gallon for mtcars dataset"
+title: "identifying effective variables on miles per gallon for mtcars dataset"
 author: "Reza Nirumand"
 date: "Wednesday, September 28, 2015"
 output: html_document
 ---
 
-#Executive Summary
-In this document we have analysed a car dataset consiting of 32 observations and 11 variables. Considering the importance of transmission type we have tried to answer below two questions using explatory data analysis and linear regression:
-## *Is an automatic or manual transmission better for MPG?*##
+#Executive Summary  
+In this document we have analysed a car dataset consisting of 32 observations and 11 variables. Considering the importance of transmission type we have tried to answer below two questions using exploratory data analysis and linear regression:  
+-*Is an automatic or manual transmission better for MPG?*
 
-##*Quantifing the MPG difference between automatic and manual transmissions*##
+-*Quantifing the MPG difference between automatic and manual transmissions*
 
 #Loading requried tools & preparing data  
 Original *mtcars* dataset consists of 32 observations with 11 variables which all stored as number Considering the documentations i have decided to do:  
@@ -34,7 +34,7 @@ mpgMean<-mean(dt$mpg);mpgSd<-sd(dt$mpg)
 
 Figure.1 shows histogram of miles per gallon for the dataset. The variable mpg has the average `r mpgMean` and standard deviation `r mpgSd` .   
 ```{r figure1,echo=FALSE,message=FALSE,fig.height=4,fig.width=4}
-hist(dt$mpg,col="gray",xlab = "miles per gallon",ylab = "Count",main="Fig.1: Histogram of miles per gallon")##figure1
+hist(dt$mpg,col="gray",xlab = "Miles/(US) gallon",ylab = "Count",main="Fig.1: Histogram of miles per gallon")##figure1
 abline(v = mean(dt$mpg),col="red") ##adding mean
 ````
 
@@ -57,8 +57,8 @@ fig2
 #Model Selection  
 In order to find a parsimonious model, we will use *nested model*  technique. That means we will begin with one regressor and will add regressors one-by-one, comparing the result for each model using anova test.
 But Considering the correlation matrix ??? finding the best subset of regressors requires exhaustive search for the best subsets of the variables.
-This can be done using diffrent r-packages such as ***"leaps"***.  
-But for the purpose of this project i have decided to follow the strategy of including variables which could describ other variables as well. 
+This can be done using different r-packages such as ***"leaps"***.  
+But for the purpose of this project i have decided to follow the strategy of including variables which could describe other variables as well. 
 For example hp could describe displacement,cyl,vs,carb and these described variables will not be added to the models.
 
 ```{r cluster2}
@@ -67,19 +67,36 @@ t2<-lm(data=dt,mpg~am+hp)
 t3<-lm(data=dt,mpg~am+hp+wt)
 t4<-lm(data=dt,mpg~am+hp+wt+gear)
 t5<-lm(data=dt,mpg~am+hp+wt+drat)
+```
+
+Before Selecting the right model using anova test, we need to first verify the assumptions required for the anova test. 
+The assumption for anova test is that the model's Residual are approximately Normal. To validate the assumption we will use the ***Shapiro-Wilk test***. The null hypothesis on this test is that the distribution is approximately normal.
+
+```{r residTest,echo=TRUE,message=FALSE}
+for(i in 1:5){
+        model<-paste("t",i,sep = "");
+        res<-residuals(eval(parse(text=model)))
+        st<-shapiro.test(res);
+        print(paste("Model ",model,"'s p-value: ",round(st$p.value,4),sep=""))}
+```
+
+As shown above, all models's p-value are bigger than our type 1 error .05 , so we failed to reject the normality hypothesis, hence the models are valid for anova test. **Considering the anova test we will choose the model 3 **since it shows significant change in RSS. 
+
+```{r anovaTest}
 anova(t1,t2,t3,t4,t5)
 ```
 
-Considering the anova test we will choose the model 3 since it shows significant change in RSS. Now we need to validae our model for the underling assupmions. The assumption for anova test is that the model's Residual are approximately Normal. To validate the assumption so we will use the ***Shapiro-Wilk test***. The null hypothesis on this test is that the distribution is approximately normal. Considering the following result we fail to reject the null hypothesis, hence our anova test is valid.
 
-```{r shapiroTest,echo=TRUE}
-st<-shapiro.test(t3$residuals)
-st
-```
+
+
 
 #Results
-
-- R2=.6 means 60% of variation of outcome is explained by linear relationship with regressors.
+```{r summaryShow,message=FALSE}
+summary(t3)
+```
+We could interprete our model as following:
+- Adjusted.R Squared=0.8227: It means 82% of mpg(miles per gallon) is explained by linear relationship with regressors(am,hp,wt)
+- 
 
 
 
