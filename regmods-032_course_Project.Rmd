@@ -94,9 +94,11 @@ anova(t1,t2,t3,t4,t5)
 ```{r summaryShow,message=FALSE}
 summary(t3)
 ```
-We could interprete our model as following:
-- Adjusted.R Squared=0.8227: It means 82% of mpg(miles per gallon) is explained by linear relationship with regressors(am,hp,wt)
-- 
+We could interprete our model as following:  
+- **Adjusted.R Squared**=0.8227: It means 82% of mpg(miles per gallon) is explained by linear relationship with regressors(am,hp,wt)  
+- compared to manual, Automatic **transmission** on the same level of horsepower and weigth would result in more 2.1 milles per gallon.  
+- increasing 1 **horsepower** will result in reduction of 0.04 miles per gallon having other variables unchanged.
+- increasing 100 pounds in **Weight**, could result in 0.3 less miles per gallon having other variables unchanged.(2.87858/100). Hint: [, 6] wt:Weight (lb/1000) variable was provided in the mtcars dataset as kilopounds(kip).  
 
 
 

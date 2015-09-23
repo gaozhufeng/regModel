@@ -146,7 +146,6 @@ t5&lt;-lm(data=dt,mpg~am+hp+wt+drat)</code></pre>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<p>Lets see the model:</p>
 <pre class="r"><code>summary(t3)</code></pre>
 <pre><code>## 
 ## Call:
@@ -168,9 +167,7 @@ t5&lt;-lm(data=dt,mpg~am+hp+wt+drat)</code></pre>
 ## Residual standard error: 2.538 on 28 degrees of freedom
 ## Multiple R-squared:  0.8399, Adjusted R-squared:  0.8227 
 ## F-statistic: 48.96 on 3 and 28 DF,  p-value: 2.908e-11</code></pre>
-<ul>
-<li>R2=.6 means 60% of variation of outcome is explained by linear relationship with regressors.</li>
-</ul>
+<p>We could interprete our model as following:<br />- <strong>Adjusted.R Squared</strong>=0.8227: It means 82% of mpg(miles per gallon) is explained by linear relationship with regressors(am,hp,wt)<br />- compared to manual, Automatic <strong>transmission</strong> on the same level of horsepower and weigth would result in more 2.1 milles per gallon.<br />- increasing 1 <strong>horsepower</strong> will result in reduction of 0.04 miles per gallon having other variables unchanged. - increasing 100 pounds in <strong>Weight</strong>, could result in 0.3 less miles per gallon having other variables unchanged.(2.87858/100). Hint: [, 6] wt Weight (lb/1000) variable was provided in the mtcars dataset as kilopounds(kip).</p>
 </div>
 <div id="appendix-a-figures" class="section level1">
 <h1>Appendix A: Figures</h1>
