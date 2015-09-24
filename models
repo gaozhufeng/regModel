@@ -10,6 +10,6 @@ fit7<-lm(data=dt,mpg~am+disp+wt+cyl+carb+gear+vs)
 
 anova(fit1,fit2,fit3,fit4,fit5,fit6,fit7)
 
-> null=lm(data=dt,mpg~am)
-> full=lm(data=dt,mpg~.)
-> step(null,scope=list(lower=null,upper=full,direction="forward"))
+ null=lm(data=dt,mpg~1)
+ full=lm(data=dt,mpg~.)
+ step(null,scope=list(lower=null,upper=full,direction="forward"))

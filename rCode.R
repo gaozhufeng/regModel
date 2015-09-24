@@ -8,10 +8,9 @@ cor(select(dt,-c(cyl,am))) ##getting correlation matrix for only numeric columns
 
 g<-ggplot(data=mtcars,aes(y=mpg,x=as.factor(am),fill=as.factor(am)))
 g<-g+geom_violin()
-g<-g+facet_grid(.~cyl) # having cyl as column
+##g<-g+facet_grid(.~cyl) # having cyl as column
 g<-g+xlab("Transmission type") ##labeling x axis
 g<-g+ylab("Miles/(US) gallon") ## labeling y axis
-g
 g<-g+ggtitle("Comparison of Miles/galon for diffrenct cars\nbased on transmission type and number of cylinders")
 g<-g+scale_x_discrete(breaks=c(0,1),labels=c("Automaitc","Manaul"))
 g<-g+scale_fill_discrete(name="Transmission type",breaks=c(0,1),labels=c("Automaitc","Manaul")) ## setting correct names for legens.

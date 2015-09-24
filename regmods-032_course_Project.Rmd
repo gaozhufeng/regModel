@@ -6,40 +6,41 @@ output: html_document
 ---
 
 #Executive Summary  
-In this document we have analysed a car dataset consisting of 32 observations and 11 variables. Considering the importance of transmission type we have tried to answer below two questions using exploratory data analysis and linear regression:  
--*Is an automatic or manual transmission better for MPG?*
+In this document we have analysed mtcars dataset consisting of 32 observations and 11 variables.
+13 cars in this dataset have manual transmissions and 19 have automatic.  
+At the first glance considering only transmission variable we could see that manual transmission is more fuel efficient having average 7.2 better mileages per gallon. 
 
--*Quantifing the MPG difference between automatic and manual transmissions*
+to Quantify the MPG difference between automatic and manual transmissions, a more through analysis using multivariable regression shows that, the variable miles per gallon could be better described as linear model consisting predictors am ,hp ,wt, qsec.  
+We estimate that with having other variables(hp,wt,qsec) fixed, using manual transmissions will result in between .03 to 2.9 more miles per gallon.  
+Our model's r.squared shows that the 83% of outcome can be explained by linear relationship of regressors.  
 
 #Loading requried tools & preparing data  
-Original *mtcars* dataset consists of 32 observations with 11 variables which all stored as number Considering the documentations i have decided to do:  
--to remove qsec from the dataset as it is not relevant to fuel consumption rather it shows overall car performance.  
--to convert the variables "am"={0,1},"vs"={0,1} to factor variables  
+Original *mtcars* dataset consists of 32 observations with 11 variables which all stored as number Considering the documentations i have decided to do  to convert the variables "am"={0,1},"vs"={0,1} to factor variables.  
 
-```{r prep,echo=TRUE,message=FALSE}
-library(datasets);library(ggplot2);library(dplyr);library(tidyr);library(GGally)
-dt<-select(mtcars,-qsec) ##removing irrelevant column
-dt<-mutate(dt,am=factor(am),vs=factor(vs)) ##adjusting column type
+```{r prep,echo=TRUE,message=FALSE,warning=FALSE}
+library(datasets);library(ggplot2);library(dplyr);library(tidyr);library(GGally); library(car)
+dt<-mutate(mtcars,am=factor(am),vs=factor(vs)) ##adjusting column type
+row.names(dt)<-row.names(mtcars)
 summary(dt) ##lets see the data
 ```
 
 A brief description of features(variables):  
 ***mpg:*** Miles/(US) gallon ;  ***cyl:*** Number of cylinders ; ***disp:*** Displacement (cubic inch) ; ***hp:*** Gross horsepower ;***drat:*** Rear axle ratio ; ***wt:*** Weight (lb/1000) ; ***qsec:*** 1/4 mile time ; ***vs:*** V/S ; ***am:*** Transmission (0 = automatic, 1 = manual) ; ***gear:*** Number of forward gears ; ***carb:*** Number of carburetors.  
 
-#Explatory data analysis#  
-
+#Exploratory data analysis#  
+show add pair plot
 ```{r calcExplatory,echo=FALSE,message=FALSE}
 mpgMean<-mean(dt$mpg);mpgSd<-sd(dt$mpg)
 ```  
 
 Figure.1 shows histogram of miles per gallon for the dataset. The variable mpg has the average `r mpgMean` and standard deviation `r mpgSd` .   
-```{r figure1,echo=FALSE,message=FALSE,fig.height=4,fig.width=4}
+```{r figure1,echo=FALSE,message=FALSE,fig.height=4,fig.width=4,fig.show='hide'}
 hist(dt$mpg,col="gray",xlab = "Miles/(US) gallon",ylab = "Count",main="Fig.1: Histogram of miles per gallon")##figure1
 abline(v = mean(dt$mpg),col="red") ##adding mean
 ````
 
 Figure.2 shows relationship between transmission type and miles per gallon.  
-```{r figure2,echo=FALSE,message=FALSE,fig.height=4,fig.width=4}
+```{r figure2,echo=FALSE,message=FALSE,fig.height=4,fig.width=4,fig.show='hide'}
 fig2<-ggplot(data=dt,aes(y=mpg,x=am,fill=am),legend=NULL)
 fig2<-fig2+geom_violin()
 fig2<-fig2+scale_x_discrete(breaks=c(0,1),labels=c("Automaitc","Manaul"))
@@ -53,6 +54,35 @@ fig2
 ##g<-ggpairs(data=dt,lower=list(continuous="smooth"),params=c(method="loess")) ##i should do plot the mpg in diffrent colors and diffrent regression line 
 ##g
 ````
+##things to add:
+pairs(<model variables>, panel = panel.smooth, col = 9 + mtcars$wt)
+pairs(mtcars, panel=panel.smooth, main="Pair Graph of Motor Trend Car Road Tests")
+leveneTest(mpg ~ factor(am), data = mtcars_vars)
+simple linera regression and r squared:We can see that the adjusted R squared value is only 0.338 which means that only 33.8% of the regression variance can be explained by our model. However we must not forget there are several other predictor variables that we must take into account to see if any play a bigger role in the model.
+
+ lm(mpg ~ wt+hp+disp+cyl+am
+ 
+ From the above plots, we can make the following observations,
+
+The points in the Residuals vs. Fitted plot seem to be randomly scattered on the plot and verify the independence condition.
+The Normal Q-Q plot consists of the points which mostly fall on the line indicating that the residuals are normally distributed.
+The Scale-Location plot consists of points scattered in a constant band pattern, indicating constant variance.
+There are some distinct points of interest (outliers or leverage points) in the top right of the plots.
+
+The Residuals vs. Leverage argues that no outliers are present, as all values fall well within the 0.5 bands.
+
+
+##Inference
+
+At this step, we make the null hypothesis as the MPG of the automatic and manual transmissions are from the same population (assuming the MPG has a normal distribution). We use the two sample T-test to show it.
+
+result <- t.test(mpg ~ am)
+result$p.value
+result$estimate
+Since the p-value is 0.00137, we reject our null hypothesis. So, the automatic and manual transmissions are from different populations. And the mean for MPG of manual transmitted cars is about 7 more than that of automatic transmitted cars.
+
+
+
 
 #Model Selection  
 In order to find a parsimonious model, we will use *nested model*  technique. That means we will begin with one regressor and will add regressors one-by-one, comparing the result for each model using anova test.
@@ -65,42 +95,62 @@ For example hp could describe displacement,cyl,vs,carb and these described varia
 t1<-lm(data=dt,mpg~am)
 t2<-lm(data=dt,mpg~am+hp)
 t3<-lm(data=dt,mpg~am+hp+wt)
-t4<-lm(data=dt,mpg~am+hp+wt+gear)
-t5<-lm(data=dt,mpg~am+hp+wt+drat)
+t4<-lm(data=dt,mpg~am+hp+wt+qsec)
+t5<-lm(data=dt,mpg~am+hp+wt+cyl)
+t6<-lm(data=dt,mpg~am+hp+wt+drat)
 ```
 
 Before Selecting the right model using anova test, we need to first verify the assumptions required for the anova test. 
 The assumption for anova test is that the model's Residual are approximately Normal. To validate the assumption we will use the ***Shapiro-Wilk test***. The null hypothesis on this test is that the distribution is approximately normal.
 
 ```{r residTest,echo=TRUE,message=FALSE}
-for(i in 1:5){
+for(i in 1:6){
         model<-paste("t",i,sep = "");
         res<-residuals(eval(parse(text=model)))
         st<-shapiro.test(res);
         print(paste("Model ",model,"'s p-value: ",round(st$p.value,4),sep=""))}
 ```
 
-As shown above, all models's p-value are bigger than our type 1 error .05 , so we failed to reject the normality hypothesis, hence the models are valid for anova test. **Considering the anova test we will choose the model 3 **since it shows significant change in RSS. 
+As shown above, all models's p-value are bigger than our type 1 error .05 , so we failed to reject the normality hypothesis, hence the models are valid for anova test.
+Considering the anova test we will **choose the model 4 ** since it shows significant change in RSS.(altought p-value is bigger than alpha, it has better adjusted.r.squared) 
 
 ```{r anovaTest}
-anova(t1,t2,t3,t4,t5)
+anova(t1,t2,t3,t4,t5,t6)
+for(i in 1:6){
+    model<-paste("t",i,sep = "");
+    st<-summary(eval(parse(text=model)))$adj.r.squared;
+    print(paste("Model ",model,"'s Adj.r.squared: ",round(st,4),sep=""))}
 ```
 
 
-#Diagnostics
+#Regression Diagnostics
+To determin whether our selected model fit to data adequately represents ourt data, we will use some common diagnostics tools:  dffits, dfbetas,influence and hat diagonals  
+##Outliers  
+```{r outliers,message=FALSE,fig.width=6,fig.height=8}
+par(mfrow=c(2,2))
+plot(t3)
+```
+
 
 
 
 
 #Results
+lets see first the models's details and confidence interval for coeffients:
 ```{r summaryShow,message=FALSE}
 summary(t3)
+confint(t3);
 ```
-We could interprete our model as following:  
-- **Adjusted.R Squared**=0.8227: It means 82% of mpg(miles per gallon) is explained by linear relationship with regressors(am,hp,wt)  
-- compared to manual, Automatic **transmission** on the same level of horsepower and weigth would result in more 2.1 milles per gallon.  
-- increasing 1 **horsepower** will result in reduction of 0.04 miles per gallon having other variables unchanged.
-- increasing 100 pounds in **Weight**, could result in 0.3 less miles per gallon having other variables unchanged.(2.87858/100). Hint: [, 6] wt:Weight (lb/1000) variable was provided in the mtcars dataset as kilopounds(kip).  
+##Model Interpretation  
+```{r textsimpleVariables,echo=FALSE,message=FALSE}
+rAdjSq<-round(summary(t3)$adj.r.squared,4)
+rAdjSq.percent<-paste(round(rAdjSq*100,0),"%",sep = "")
+confs<-confint(t3)
+```
+- **Adjusted.R Squared**=`r rAdjSq`: It means `r rAdjSq.percent` of mpg(miles per gallon) is explained by linear relationship with regressors("am"" and "hp and "wt").    
+- No statistically significant linear dependence of the mean of manualand Automatic transmission on the same level of horsepower and weigth is detected.
+- we estimated that, increasing 1 **horsepower** will result in reduction of miles per gallon between `r abs(round(confs[3,2],2))` and `r abs(round(confs[3,1],2))` having other variables fixed.
+- we estimated that, increasing 100 pounds in **Weight**, will result in reduction of miles per gallon between `r abs(round(confs[4,2]/10,2))` and `r abs(round(confs[4,1]/10,2))` having other variables fixed. (note: slop/10). Hint: [, 6] wt:Weight (lb/1000) variable was provided in the mtcars dataset as kilopounds(kip).  
 
 
 
