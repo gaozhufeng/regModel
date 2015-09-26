@@ -3,14 +3,14 @@ title: Analysing relationship between Miles per gallon and Transmission for mtca
   dataset
 author: "Reza Nirumand"
 date: "Sunday, September 28, 2015"
-output: html_document
+output: pdf_document
 ---
 
 ##Executive Summary  
 In this document we have analysed mtcars dataset which consist of 32 observations and 11 variables.
 13 cars in this dataset have manual transmissions and 19 have automatic.  
-At the first glance (Fig.2) considering only transmission variable we could see that manual transmission is more fuel efficient having average 7.2 better mileages per gallon. But manual transmission is not only variable describing the MPG variable. (Fig.3,Fig4,Fig5)
-to Quantify the MPG difference between automatic and manual transmissions, a more through analysis using multivariable regression shows that, the variable MPG could be better described as linear model consisting predictors am ,hp ,wt, qsec.  
+At the first glance (Fig.2) considering only transmission variable we could see that manual transmission is more fuel efficient having average 7.2 better mileages per gallon. But manual transmission is not only variable describing the MPG variable (Fig.3,Fig4,Fig5).  
+To *Quantify the MPG difference between automatic and manual transmissions*, a more through analysis using multivariable regression shows that, the variable MPG could be better described as linear model consisting predictors am ,hp ,wt, qsec.  
 We estimate that with having other variables(hp,wt,qsec) fixed, using manual transmissions will result in between .03 to 2.9 more miles per gallon.  
 Our model's r.squared shows that the 83% of outcome can be explained by linear relationship of regressors.  
 
@@ -22,7 +22,7 @@ dt<-mutate(mtcars,am=factor(am),vs=factor(vs)) ##adjusting column type
 row.names(dt)<-row.names(mtcars)
 mpgMean<-mean(dt$mpg);mpgSd<-sd(dt$mpg) ;  summary(dt) ##lets see the data
 ```  
-To get an insight into the data we have ploted the relationship between MPG and some of the variables(which we used in our Model).Fig.1 - Fig.5 shows plot of mtcars pairwise variables along their correlations. The variable MPG  has the average `r mpgMean` and standard deviation `r mpgSd`. 
+To get an insight into the data we have ploted the relationship between MPG and some of the variables(which we used in our Model).Fig.1 - Fig.5 shows plot of mtcars pairwise variables along their correlations. The variable MPG  has the average `r round(mpgMean,2)` and standard deviation `r round(mpgSd,2)`.   
 Also We would like to see if cars with automatic and manual transmission are from the same population. Since the number of observation is not alot we have used t-test. The null hypothesis is the MPG of the automatic and manual transmissions are from the same population.
 ```{r ttest,echo=FALSE,results='hide'}
 result <- t.test(dt$mpg ~ dt$am);result$p.value;result$estimate
@@ -76,18 +76,19 @@ rAdjSq.percent<-paste(round(rAdjSq*100,0),"%",sep = "")
 confs<-confint(Mod4)
 ```
 - **Adjusted.R Squared**=`r rAdjSq`: It means `r rAdjSq.percent` of mpg(miles per gallon) is explained by linear relationship with regressors("am"" and "hp and "wt").  
-- Compared to automatic transmission, Manual transmission shows siginificant change in milles per gallon (`r abs(round(confs[2,2],2))` and `r abs(round(confs[2,1],2))` miles/gallon) having fixed other variables.  
+- Compared to automatic transmission, Manual transmission shows siginificant change in milles per gallon (between `r abs(round(confs[2,1],2))` and `r abs(round(confs[2,2],2))` miles/gallon) having fixed other variables.  
 - we estimated that, increasing 100 pounds in **Weight**, will result in reduction of miles per gallon between `r abs(round(confs[4,2]/10,2))` and `r abs(round(confs[4,1]/10,2))` having other variables fixed. (note: slop/10). Hint: [, 6] wt:Weight (lb/1000) variable was provided in the mtcars dataset as kilopounds(kip).  
 - Having other variables fixed Horspower does not show significant linear effect on miles per gallon.
 - Having other variables fixed qsec(1/4 mile time) does not show significant linear effect on miles per gallon.  
-Conisdering that we have achived the highest r.squared using mentioned model and also that, horspower and qsec are not statistically significant, it might be a hint that linear model is not a proper model for this dataset.  
+Conisdering that we have achived the highest r.squared using mentioned model and also horsepower and qsec are not statistically significant, it might be a hint that linear model is not a proper model for this dataset.  
 ```{r summaryShow,echo=FALSE,message=FALSE}
 summary(Mod4)$coef
 ##confint(Mod4);
 ```
 
 
-#Appendix  
+#Appendix 
+please note all codes for generating this report can be found in **[here](https://github.com/nirumand/regModel)**   
 ```{r figure1,echo=FALSE,results='markup',fig.height=11,fig.width=11,cache=TRUE} 
 gpairs<-ggpairs(mtcars,lower=list(continuous = "smooth"),title = "Fig.1: scatterplot of pairwise variable & correlations")
 gpairs
